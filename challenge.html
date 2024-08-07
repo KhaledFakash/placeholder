@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            background: linear-gradient(45deg, rgb(0, 0, 139), rgb(92, 0, 0));
+            font-family: Arial, Helvetica, sans-serif;
+            margin-bottom: 0px;
+        }
+        h1,h2,h3,h4,h5,h6 {
+            margin: 0;
+        }
+        #list li {
+            background-color: #f9f9f9;
+            padding: 10px;
+            width: 300px;
+            border-radius: 20px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2);
+        }
+        li h2,
+        li h3 {
+            margin: 2px 0;
+            font-size: 15px;
+        }
+        li p {
+            margin: 0; font-size: 11px;
+            font-weight: bold;
+        }
+        .selected {
+            border: 5px solid orange;
+        }
+    </style>
+    <script src="node_modules/axios/dist/axios.js"></script>
+</head>
+<body>
+    <div id="parent" style="display: flex; justify-content: space-between;">
+        <div id="users" style="width: 400px; padding: 30px 10px 30px 0">
+            <ul id="list" style="margin: 0; list-style: none;">
+                <li>
+                    <h2>Khaled Fakach</h2>
+                    <h3>sergio@gmail.com</h3>
+                </li>
+            </ul>
+        </div>
+        <div id="content" style="background-color: #ccc; margin-top: 15px; flex: 1; padding: 20px 30px;">
+            <ul style="margin: 0; list-style: none; padding: 0;">
+                <li id="result">
+                </li>
+            </ul>
+        </div>
+    </div>
+    <script>
+
+
+        function getUsersUsingAxios() {
+            return new Promise(function(resolve, reject) {
+                axios.get('https://jsonplaceholder.typicode.com/users')
+                .then(res => {
+                    document.getElementById("list").innerHTML = ""
+                    let users = res.data;
+                    for(let user of users) {
+                        document.getElementById("list").innerHTML += `
+                                    <li onclick="clickedItem(${user.id}, this)">
+                                        <h2>${user.name}</h2>
+                                        <h3>${user.email}</h3>
+                                    </li>
+                        `
+                    }
+                })
+                resolve()
+                .catch((error) => {
+                    alert(error);
+                    reject()
+                })
+            })
+        }
+
+        function getPostsUsingAxios(userId) {
+                axios.get(`https://jsonplaceholder.typicode.com/posts?userId=${userId}`)
+                .then(res => {
+                    let posts = res.data;
+                    document.getElementById("result").innerHTML = ""
+                    for (let post of posts) {
+                        document.getElementById("result").innerHTML += `
+                            <div style="background-color: white; padding: 10px; border-radius: 5px; margin-bottom: 10px; box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.2);">
+                                <h2 style="border-bottom: 1px solid black; padding: 2px 0;">${post.title}</h2>
+                                <h3 style="margin-top: 10px;">${post.body}</h3>
+                            </div>
+                        `
+                    }
+                }).catch((error) => {
+                    alert(error)
+                })
+            }
+
+            getUsersUsingAxios()
+            .then(() => {
+                getPostsUsingAxios(1)
+            }).catch((error) => {
+                alert(error)
+            })
+
+        function clickedItem(id, el) {
+            getPostsUsingAxios(id)
+            let theClass = document.getElementsByClassName("selected");
+            for (let ele of theClass) {
+                ele.classList.remove("selected")
+            }
+            el.classList.add("selected")
+        }
+    </script>
+</body>
+</html>
